@@ -1,0 +1,78 @@
+#!/bin/bash
+# github-download-release
+#
+# Copyright (C) 2018  Mattias Ohlsson
+# https://github.com/mattias-ohlsson/github-download-release
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+
+set -e
+
+self=$(basename $0)
+self_version=0.1
+
+# Parse options
+TEMP=`getopt -o h,s: -l help,version,select: -n $self -- "$@"`
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+eval set -- "$TEMP"
+
+while true ; do
+	case "$1" in
+		-h|--help)
+			cat <<- EOF
+			Usage: $self [options] NAMESPACE/PROJECT [RELEASE]
+			
+			Options:
+			  -s, --select      file to select (linux_x64, win_32...)
+			  --version         print version information and exit
+			  -h, --help        show this help message and exit
+			EOF
+			shift
+			exit ;;
+		-s|--select) file_match=$2 ; shift 2 ;;
+		--version)
+			echo $self_version; shift ; exit ;;
+		--) shift ; break ;;
+		*) echo "Internal error!" ; exit 1 ;;
+	esac
+done
+
+if [[ $# -eq 0 ]]; then
+        echo "Try '$self --help' for more information."
+        exit
+fi
+
+project=$1
+release=${2:-latest}
+
+if [[ "$release" != "latest" ]]; then
+	release="tags/$release"
+fi
+
+command -v curl >/dev/null || { echo "$name: curl: command not found"; \
+ exit 1; }
+
+command -v wget >/dev/null || { echo "$name: wget: command not found"; \
+ exit 1; }
+
+browser_download_url=$(curl -s "https://api.github.com/repos/$project/releases/$release" \
+ | grep '"browser_download_url":' | grep "$file_match" | head -1 | cut -d'"' -f4)
+
+if [[ -z $browser_download_url ]]; then
+	echo "$self: Can't find download URL"
+	exit 1
+fi
+
+wget --no-clobber "$browser_download_url"
