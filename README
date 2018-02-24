@@ -1,0 +1,19 @@
+    github-download-release - GitHub Download Release
+
+https://github.com/mattias-ohlsson/github-download-release
+
+INSTALL
+
+    make install
+
+UNINSTALL
+
+    rm /usr/bin/github-download-release
+
+EXAMPLES
+
+    github-download-release octocat/Hello-World
+    github-download-release octocat/Hello-World latest
+    github-download-release octocat/Hello-World --select linux
+    github-download-release octocat/Hello-World --select amd64
+    github-download-release octocat/Hello-World 4.2 --select i686
