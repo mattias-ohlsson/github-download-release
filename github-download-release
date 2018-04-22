@@ -38,6 +38,13 @@ while true ; do
 			  -s, --select      file to select (linux_x64, win_32...)
 			  --version         print version information and exit
 			  -h, --help        show this help message and exit
+			
+			Examples:
+			  github-download-release octocat/Hello-World
+			  github-download-release octocat/Hello-World latest
+			  github-download-release octocat/Hello-World --select linux
+			  github-download-release octocat/Hello-World --select amd64
+			  github-download-release octocat/Hello-World 4.2 --select i686
 			EOF
 			shift
 			exit ;;
